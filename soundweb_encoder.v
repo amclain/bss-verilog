@@ -1,47 +1,47 @@
 module soundweb_encoder(
-    input [7:0] command,
-    input [7:0] address_0,
-    input [7:0] address_1,
-    input [7:0] address_2,
-    input [7:0] address_3,
-    input [7:0] address_4,
-    input [7:0] address_5,
-    input [7:0] sv_0,
-    input [7:0] sv_1,
-    input [7:0] data_0,
-    input [7:0] data_1,
-    input [7:0] data_2,
-    input [7:0] data_3,
-    
-    output [7:0] packet_0,
-    output [7:0] packet_1,
-    output [7:0] packet_2,
-    output [7:0] packet_3,
-    output [7:0] packet_4,
-    output [7:0] packet_5,
-    output [7:0] packet_6,
-    output [7:0] packet_7,
-    output [7:0] packet_8,
-    output [7:0] packet_9,
-    output [7:0] packet_10,
-    output [7:0] packet_11,
-    output [7:0] packet_12,
-    output [7:0] packet_13,
-    output [7:0] packet_14,
-    output [7:0] packet_15,
-    output [7:0] packet_16,
-    output [7:0] packet_17,
-    output [7:0] packet_18,
-    output [7:0] packet_19,
-    output [7:0] packet_20,
-    output [7:0] packet_21,
-    output [7:0] packet_22,
-    output [7:0] packet_23,
-    output [7:0] packet_24,
-    output [7:0] packet_25,
-    output [7:0] packet_26,
-    output [7:0] packet_27,
-    output [7:0] packet_28
+  input [7:0] command,
+  input [7:0] address_0,
+  input [7:0] address_1,
+  input [7:0] address_2,
+  input [7:0] address_3,
+  input [7:0] address_4,
+  input [7:0] address_5,
+  input [7:0] sv_0,
+  input [7:0] sv_1,
+  input [7:0] data_0,
+  input [7:0] data_1,
+  input [7:0] data_2,
+  input [7:0] data_3,
+
+  output [7:0] packet_0,
+  output [7:0] packet_1,
+  output [7:0] packet_2,
+  output [7:0] packet_3,
+  output [7:0] packet_4,
+  output [7:0] packet_5,
+  output [7:0] packet_6,
+  output [7:0] packet_7,
+  output [7:0] packet_8,
+  output [7:0] packet_9,
+  output [7:0] packet_10,
+  output [7:0] packet_11,
+  output [7:0] packet_12,
+  output [7:0] packet_13,
+  output [7:0] packet_14,
+  output [7:0] packet_15,
+  output [7:0] packet_16,
+  output [7:0] packet_17,
+  output [7:0] packet_18,
+  output [7:0] packet_19,
+  output [7:0] packet_20,
+  output [7:0] packet_21,
+  output [7:0] packet_22,
+  output [7:0] packet_23,
+  output [7:0] packet_24,
+  output [7:0] packet_25,
+  output [7:0] packet_26,
+  output [7:0] packet_27,
+  output [7:0] packet_28
 );
 
 parameter ESC = 8'h1B;
@@ -121,135 +121,135 @@ assign input_buffer[12] = data[3];
 
 always @(*)
 begin
-    address_offset[0] = 0;
-    address_offset[1] = 0;
-    address_offset[2] = 0;
-    address_offset[3] = 0;
-    address_offset[4] = 0;
-    address_offset[5] = 0;
-    
-    packet_buf[0] = 8'h02;
-    packet_buf[1] = command;
-    
-    if (is_reserved_byte(address[0])) begin
-        address_is_escaped[0] = 1'b1;
-        packet_buf[2 + address_offset[0]] = ESC;
-        packet_buf[3 + address_offset[0]] = address[0] + 8'h80;
-    end else begin
-        address_is_escaped[0] = 1'b0;
-        packet_buf[2 + address_offset[0]] = address[0];
-    end
-    
-    if (address_is_escaped[0]) begin
-        address_offset[1] = address_offset[1] + 1;
-        address_offset[2] = address_offset[2] + 1;
-        address_offset[3] = address_offset[3] + 1;
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[1])) begin
-        address_is_escaped[1] = 1'b1;
-        packet_buf[3 + address_offset[1]] = ESC;
-        packet_buf[4 + address_offset[1]] = address[1] + 8'h80;
-    end else begin
-        address_is_escaped[1] = 1'b0;
-        packet_buf[3 + address_offset[1]] = address[1];
-    end
-    
-    if (address_is_escaped[1]) begin
-        address_offset[2] = address_offset[2] + 1;
-        address_offset[3] = address_offset[3] + 1;
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[2])) begin
-        address_is_escaped[2] = 1'b1;
-        packet_buf[4 + address_offset[2]] = ESC;
-        packet_buf[5 + address_offset[2]] = address[2] + 8'h80;
-    end else begin
-        address_is_escaped[2] = 1'b0;
-        packet_buf[4 + address_offset[2]] = address[2];
-    end
-    
-    if (address_is_escaped[2]) begin
-        address_offset[3] = address_offset[3] + 1;
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[3])) begin
-        address_is_escaped[3] = 1'b1;
-        packet_buf[5 + address_offset[3]] = ESC;
-        packet_buf[6 + address_offset[3]] = address[3] + 8'h80;
-    end else begin
-        address_is_escaped[3] = 1'b0;
-        packet_buf[5 + address_offset[3]] = address[3];
-    end
-    
-    if (address_is_escaped[3]) begin
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[4])) begin
-        address_is_escaped[4] = 1'b1;
-        packet_buf[6 + address_offset[4]] = ESC;
-        packet_buf[7 + address_offset[4]] = address[4] + 8'h80;
-    end else begin
-        address_is_escaped[4] = 1'b0;
-        packet_buf[6 + address_offset[4]] = address[4];
-    end
-    
-    if (address_is_escaped[4]) begin
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[5])) begin
-        address_is_escaped[5] = 1'b1;
-        packet_buf[7 + address_offset[5]] = ESC;
-        packet_buf[8 + address_offset[5]] = address[5] + 8'h80;
-    end else begin
-        address_is_escaped[5] = 1'b0;
-        packet_buf[7 + address_offset[5]] = address[5];
-    end
-    
-    // if (is_reserved_byte(address[1])) begin
-    //     address_is_escaped[1] = 1'b1;
-        
-    //     if (address_is_escaped[0]) begin
-    //         packet_buf[4] = ESC;
-    //         packet_buf[5] = address[1] + 8'h80;
-    //     end else begin
-    //         packet_buf[3] = ESC;
-    //         packet_buf[4] = address[1] + 8'h80;
-    //     end
-    // end else begin
-    //     address_is_escaped[1] = 1'b0;
-        
-    //     if (address_is_escaped[0]) begin
-    //         packet_buf[4] = address[1];
-    //     end else begin
-    //         packet_buf[3] = address[1];
-    //     end
-    // end
+  address_offset[0] = 0;
+  address_offset[1] = 0;
+  address_offset[2] = 0;
+  address_offset[3] = 0;
+  address_offset[4] = 0;
+  address_offset[5] = 0;
+
+  packet_buf[0] = 8'h02;
+  packet_buf[1] = command;
+
+  if (is_reserved_byte(address[0])) begin
+    address_is_escaped[0] = 1'b1;
+    packet_buf[2 + address_offset[0]] = ESC;
+    packet_buf[3 + address_offset[0]] = address[0] + 8'h80;
+  end else begin
+    address_is_escaped[0] = 1'b0;
+    packet_buf[2 + address_offset[0]] = address[0];
+  end
+
+  if (address_is_escaped[0]) begin
+    address_offset[1] = address_offset[1] + 1;
+    address_offset[2] = address_offset[2] + 1;
+    address_offset[3] = address_offset[3] + 1;
+    address_offset[4] = address_offset[4] + 1;
+    address_offset[5] = address_offset[5] + 1;
+  end
+
+  if (is_reserved_byte(address[1])) begin
+    address_is_escaped[1] = 1'b1;
+    packet_buf[3 + address_offset[1]] = ESC;
+    packet_buf[4 + address_offset[1]] = address[1] + 8'h80;
+  end else begin
+    address_is_escaped[1] = 1'b0;
+    packet_buf[3 + address_offset[1]] = address[1];
+  end
+
+  if (address_is_escaped[1]) begin
+    address_offset[2] = address_offset[2] + 1;
+    address_offset[3] = address_offset[3] + 1;
+    address_offset[4] = address_offset[4] + 1;
+    address_offset[5] = address_offset[5] + 1;
+  end
+
+  if (is_reserved_byte(address[2])) begin
+    address_is_escaped[2] = 1'b1;
+    packet_buf[4 + address_offset[2]] = ESC;
+    packet_buf[5 + address_offset[2]] = address[2] + 8'h80;
+  end else begin
+    address_is_escaped[2] = 1'b0;
+    packet_buf[4 + address_offset[2]] = address[2];
+  end
+
+  if (address_is_escaped[2]) begin
+    address_offset[3] = address_offset[3] + 1;
+    address_offset[4] = address_offset[4] + 1;
+    address_offset[5] = address_offset[5] + 1;
+  end
+
+  if (is_reserved_byte(address[3])) begin
+    address_is_escaped[3] = 1'b1;
+    packet_buf[5 + address_offset[3]] = ESC;
+    packet_buf[6 + address_offset[3]] = address[3] + 8'h80;
+  end else begin
+    address_is_escaped[3] = 1'b0;
+    packet_buf[5 + address_offset[3]] = address[3];
+  end
+
+  if (address_is_escaped[3]) begin
+    address_offset[4] = address_offset[4] + 1;
+    address_offset[5] = address_offset[5] + 1;
+  end
+
+  if (is_reserved_byte(address[4])) begin
+    address_is_escaped[4] = 1'b1;
+    packet_buf[6 + address_offset[4]] = ESC;
+    packet_buf[7 + address_offset[4]] = address[4] + 8'h80;
+  end else begin
+    address_is_escaped[4] = 1'b0;
+    packet_buf[6 + address_offset[4]] = address[4];
+  end
+
+  if (address_is_escaped[4]) begin
+    address_offset[5] = address_offset[5] + 1;
+  end
+
+  if (is_reserved_byte(address[5])) begin
+    address_is_escaped[5] = 1'b1;
+    packet_buf[7 + address_offset[5]] = ESC;
+    packet_buf[8 + address_offset[5]] = address[5] + 8'h80;
+  end else begin
+    address_is_escaped[5] = 1'b0;
+    packet_buf[7 + address_offset[5]] = address[5];
+  end
+
+  // if (is_reserved_byte(address[1])) begin
+  //   address_is_escaped[1] = 1'b1;
+
+  //   if (address_is_escaped[0]) begin
+  //     packet_buf[4] = ESC;
+  //     packet_buf[5] = address[1] + 8'h80;
+  //   end else begin
+  //     packet_buf[3] = ESC;
+  //     packet_buf[4] = address[1] + 8'h80;
+  //   end
+  // end else begin
+  //   address_is_escaped[1] = 1'b0;
+
+  //   if (address_is_escaped[0]) begin
+  //     packet_buf[4] = address[1];
+  //   end else begin
+  //     packet_buf[3] = address[1];
+  //   end
+  // end
 end
 
 function is_reserved_byte;
 input [7:0] byte;
 begin
-    if (
-        byte == 8'h02 ||
-        byte == 8'h03 ||
-        byte == 8'h06 ||
-        byte == 8'h15 ||
-        byte == 8'h1B
-    ) begin
-        is_reserved_byte = 1'b1;
-    end else begin
-        is_reserved_byte = 1'b0;
-    end
+  if (
+    byte == 8'h02 ||
+    byte == 8'h03 ||
+    byte == 8'h06 ||
+    byte == 8'h15 ||
+    byte == 8'h1B
+  ) begin
+    is_reserved_byte = 1'b1;
+  end else begin
+    is_reserved_byte = 1'b0;
+  end
 end
 endfunction
 

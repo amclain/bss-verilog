@@ -3,85 +3,85 @@
 //=======================================================
 
 module bss_verilog(
-    //////////// ADC //////////
-    output                      ADC_CONVST,
-    output                      ADC_SCK,
-    output                      ADC_SDI,
-    input                       ADC_SDO,
+  //////////// ADC //////////
+  output                      ADC_CONVST,
+  output                      ADC_SCK,
+  output                      ADC_SDI,
+  input                       ADC_SDO,
 
-    //////////// ARDUINO //////////
-    inout           [15:0]      ARDUINO_IO,
-    inout                       ARDUINO_RESET_N,
+  //////////// ARDUINO //////////
+  inout           [15:0]      ARDUINO_IO,
+  inout                       ARDUINO_RESET_N,
 
-    //////////// CLOCK //////////
-    input                       FPGA_CLK1_50,
-    input                       FPGA_CLK2_50,
-    input                       FPGA_CLK3_50,
+  //////////// CLOCK //////////
+  input                       FPGA_CLK1_50,
+  input                       FPGA_CLK2_50,
+  input                       FPGA_CLK3_50,
 
-    //////////// HPS //////////
-    // inout                        HPS_CONV_USB_N,
-    // output           [14:0]      HPS_DDR3_ADDR,
-    // output            [2:0]      HPS_DDR3_BA,
-    // output                       HPS_DDR3_CAS_N,
-    // output                       HPS_DDR3_CK_N,
-    // output                       HPS_DDR3_CK_P,
-    // output                       HPS_DDR3_CKE,
-    // output                       HPS_DDR3_CS_N,
-    // output            [3:0]      HPS_DDR3_DM,
-    // inout            [31:0]      HPS_DDR3_DQ,
-    // inout             [3:0]      HPS_DDR3_DQS_N,
-    // inout             [3:0]      HPS_DDR3_DQS_P,
-    // output                       HPS_DDR3_ODT,
-    // output                       HPS_DDR3_RAS_N,
-    // output                       HPS_DDR3_RESET_N,
-    // input                        HPS_DDR3_RZQ,
-    // output                       HPS_DDR3_WE_N,
-    // output                       HPS_ENET_GTX_CLK,
-    // inout                        HPS_ENET_INT_N,
-    // output                       HPS_ENET_MDC,
-    // inout                        HPS_ENET_MDIO,
-    // input                        HPS_ENET_RX_CLK,
-    // input             [3:0]      HPS_ENET_RX_DATA,
-    // input                        HPS_ENET_RX_DV,
-    // output            [3:0]      HPS_ENET_TX_DATA,
-    // output                       HPS_ENET_TX_EN,
-    // inout                        HPS_GSENSOR_INT,
-    // inout                        HPS_I2C0_SCLK,
-    // inout                        HPS_I2C0_SDAT,
-    // inout                        HPS_I2C1_SCLK,
-    // inout                        HPS_I2C1_SDAT,
-    // inout                        HPS_KEY,
-    // inout                        HPS_LED,
-    // inout                        HPS_LTC_GPIO,
-    // output                       HPS_SD_CLK,
-    // inout                        HPS_SD_CMD,
-    // inout             [3:0]      HPS_SD_DATA,
-    // output                       HPS_SPIM_CLK,
-    // input                        HPS_SPIM_MISO,
-    // output                       HPS_SPIM_MOSI,
-    // inout                        HPS_SPIM_SS,
-    // input                        HPS_UART_RX,
-    // output                       HPS_UART_TX,
-    // input                        HPS_USB_CLKOUT,
-    // inout             [7:0]      HPS_USB_DATA,
-    // input                        HPS_USB_DIR,
-    // input                        HPS_USB_NXT,
-    // output                       HPS_USB_STP,
+  //////////// HPS //////////
+  // inout                        HPS_CONV_USB_N,
+  // output           [14:0]      HPS_DDR3_ADDR,
+  // output            [2:0]      HPS_DDR3_BA,
+  // output                       HPS_DDR3_CAS_N,
+  // output                       HPS_DDR3_CK_N,
+  // output                       HPS_DDR3_CK_P,
+  // output                       HPS_DDR3_CKE,
+  // output                       HPS_DDR3_CS_N,
+  // output            [3:0]      HPS_DDR3_DM,
+  // inout            [31:0]      HPS_DDR3_DQ,
+  // inout             [3:0]      HPS_DDR3_DQS_N,
+  // inout             [3:0]      HPS_DDR3_DQS_P,
+  // output                       HPS_DDR3_ODT,
+  // output                       HPS_DDR3_RAS_N,
+  // output                       HPS_DDR3_RESET_N,
+  // input                        HPS_DDR3_RZQ,
+  // output                       HPS_DDR3_WE_N,
+  // output                       HPS_ENET_GTX_CLK,
+  // inout                        HPS_ENET_INT_N,
+  // output                       HPS_ENET_MDC,
+  // inout                        HPS_ENET_MDIO,
+  // input                        HPS_ENET_RX_CLK,
+  // input             [3:0]      HPS_ENET_RX_DATA,
+  // input                        HPS_ENET_RX_DV,
+  // output            [3:0]      HPS_ENET_TX_DATA,
+  // output                       HPS_ENET_TX_EN,
+  // inout                        HPS_GSENSOR_INT,
+  // inout                        HPS_I2C0_SCLK,
+  // inout                        HPS_I2C0_SDAT,
+  // inout                        HPS_I2C1_SCLK,
+  // inout                        HPS_I2C1_SDAT,
+  // inout                        HPS_KEY,
+  // inout                        HPS_LED,
+  // inout                        HPS_LTC_GPIO,
+  // output                       HPS_SD_CLK,
+  // inout                        HPS_SD_CMD,
+  // inout             [3:0]      HPS_SD_DATA,
+  // output                       HPS_SPIM_CLK,
+  // input                        HPS_SPIM_MISO,
+  // output                       HPS_SPIM_MOSI,
+  // inout                        HPS_SPIM_SS,
+  // input                        HPS_UART_RX,
+  // output                       HPS_UART_TX,
+  // input                        HPS_USB_CLKOUT,
+  // inout             [7:0]      HPS_USB_DATA,
+  // input                        HPS_USB_DIR,
+  // input                        HPS_USB_NXT,
+  // output                       HPS_USB_STP,
 
-    //////////// KEY //////////
-    input            [1:0]      KEY,
+  //////////// KEY //////////
+  input            [1:0]      KEY,
 
-    //////////// LED //////////
-    output           [7:0]      LED,
+  //////////// LED //////////
+  output           [7:0]      LED,
 
-    //////////// SW //////////
-    input            [3:0]      SW,
+  //////////// SW //////////
+  input            [3:0]      SW,
 
-    //////////// GPIO_0, GPIO connect to GPIO Default //////////
-    inout           [35:0]      GPIO_0,
+  //////////// GPIO_0, GPIO connect to GPIO Default //////////
+  inout           [35:0]      GPIO_0,
 
-    //////////// GPIO_1, GPIO connect to GPIO Default //////////
-    inout           [35:0]      GPIO_1
+  //////////// GPIO_1, GPIO connect to GPIO Default //////////
+  inout           [35:0]      GPIO_1
 );
 
 //=======================================================
@@ -118,49 +118,49 @@ wire [7:0] input_buffer[0:12];
 //=======================================================
 
 soundweb_encoder u0 (
-    .command (command),
-    .address_0 (address[0]),
-    .address_1 (address[1]),
-    .address_2 (address[2]),
-    .address_3 (address[3]),
-    .address_4 (address[4]),
-    .address_5 (address[5]),
-    .sv_0 (sv[0]),
-    .sv_1 (sv[1]),
-    .data_0 (data[0]),
-    .data_1 (data[1]),
-    .data_2 (data[2]),
-    .data_3 (data[3]),
-    
-    .packet_0  (out[0]),
-    .packet_1  (out[1]),
-    .packet_2  (out[2]),
-    .packet_3  (out[3]),
-    .packet_4  (out[4]),
-    .packet_5  (out[5]),
-    .packet_6  (out[6]),
-    .packet_7  (out[7]),
-    .packet_8  (out[8]),
-    .packet_9  (out[9]),
-    .packet_10 (out[10]),
-    .packet_11 (out[11]),
-    .packet_12 (out[12]),
-    .packet_13 (out[13]),
-    .packet_14 (out[14]),
-    .packet_15 (out[15]),
-    .packet_16 (out[16]),
-    .packet_17 (out[17]),
-    .packet_18 (out[18]),
-    .packet_19 (out[19]),
-    .packet_20 (out[20]),
-    .packet_21 (out[21]),
-    .packet_22 (out[22]),
-    .packet_23 (out[23]),
-    .packet_24 (out[24]),
-    .packet_25 (out[25]),
-    .packet_26 (out[26]),
-    .packet_27 (out[27]),
-    .packet_28 (out[28])
+  .command (command),
+  .address_0 (address[0]),
+  .address_1 (address[1]),
+  .address_2 (address[2]),
+  .address_3 (address[3]),
+  .address_4 (address[4]),
+  .address_5 (address[5]),
+  .sv_0 (sv[0]),
+  .sv_1 (sv[1]),
+  .data_0 (data[0]),
+  .data_1 (data[1]),
+  .data_2 (data[2]),
+  .data_3 (data[3]),
+
+  .packet_0  (out[0]),
+  .packet_1  (out[1]),
+  .packet_2  (out[2]),
+  .packet_3  (out[3]),
+  .packet_4  (out[4]),
+  .packet_5  (out[5]),
+  .packet_6  (out[6]),
+  .packet_7  (out[7]),
+  .packet_8  (out[8]),
+  .packet_9  (out[9]),
+  .packet_10 (out[10]),
+  .packet_11 (out[11]),
+  .packet_12 (out[12]),
+  .packet_13 (out[13]),
+  .packet_14 (out[14]),
+  .packet_15 (out[15]),
+  .packet_16 (out[16]),
+  .packet_17 (out[17]),
+  .packet_18 (out[18]),
+  .packet_19 (out[19]),
+  .packet_20 (out[20]),
+  .packet_21 (out[21]),
+  .packet_22 (out[22]),
+  .packet_23 (out[23]),
+  .packet_24 (out[24]),
+  .packet_25 (out[25]),
+  .packet_26 (out[26]),
+  .packet_27 (out[27]),
+  .packet_28 (out[28])
 );
 
 // Mock input
@@ -176,48 +176,48 @@ assign write_address_5 = ARDUINO_IO[14];
 assign write_sv_0 = ARDUINO_IO[15];
 
 always @(
-    posedge write_command or
-    posedge write_address_0 or
-    posedge write_address_1 or
-    posedge write_address_2 or
-    posedge write_address_3 or
-    posedge write_address_4 or
-    posedge write_address_5 or
-    posedge write_sv_0 or
-    posedge write_sv_1 or
-    posedge write_data_0 or
-    posedge write_data_1 or
-    posedge write_data_2 or
-    posedge write_data_3
+  posedge write_command or
+  posedge write_address_0 or
+  posedge write_address_1 or
+  posedge write_address_2 or
+  posedge write_address_3 or
+  posedge write_address_4 or
+  posedge write_address_5 or
+  posedge write_sv_0 or
+  posedge write_sv_1 or
+  posedge write_data_0 or
+  posedge write_data_1 or
+  posedge write_data_2 or
+  posedge write_data_3
 )
 begin
-    if (write_command) begin
-        command <= data_in;
-    end else if (write_address_0) begin
-        address[0] <= data_in;
-    end else if (write_address_1) begin
-        address[1] <= data_in;
-    end else if (write_address_2) begin
-        address[2] <= data_in;
-    end else if (write_address_3) begin
-        address[3] <= data_in;
-    end else if (write_address_4) begin
-        address[4] <= data_in;
-    end else if (write_address_5) begin
-        address[5] <= data_in;
-    end else if (write_sv_0) begin
-        sv[0] <= data_in;
-    end else if (write_sv_1) begin
-        sv[1] <= data_in;
-    end else if (write_data_0) begin
-        data[0] <= data_in;
-    end else if (write_data_1) begin
-        data[1] <= data_in;
-    end else if (write_data_2) begin
-        data[2] <= data_in;
-    end else if (write_data_3) begin
-        data[3] <= data_in;
-    end
+  if (write_command) begin
+    command <= data_in;
+  end else if (write_address_0) begin
+    address[0] <= data_in;
+  end else if (write_address_1) begin
+    address[1] <= data_in;
+  end else if (write_address_2) begin
+    address[2] <= data_in;
+  end else if (write_address_3) begin
+    address[3] <= data_in;
+  end else if (write_address_4) begin
+    address[4] <= data_in;
+  end else if (write_address_5) begin
+    address[5] <= data_in;
+  end else if (write_sv_0) begin
+    sv[0] <= data_in;
+  end else if (write_sv_1) begin
+    sv[1] <= data_in;
+  end else if (write_data_0) begin
+    data[0] <= data_in;
+  end else if (write_data_1) begin
+    data[1] <= data_in;
+  end else if (write_data_2) begin
+    data[2] <= data_in;
+  end else if (write_data_3) begin
+    data[3] <= data_in;
+  end
 end
 
 assign GPIO_0[7:0]   = out[0][7:0];
