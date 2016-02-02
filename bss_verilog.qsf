@@ -404,6 +404,7 @@ set_global_assignment -name FLOW_ENABLE_RTL_VIEWER ON
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name VERILOG_INPUT_VERSION VERILOG_2001
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
+set_global_assignment -name VERILOG_FILE mock_input.v
 set_global_assignment -name VERILOG_FILE soundweb_encoder.v
 set_global_assignment -name VERILOG_FILE bss_verilog.v
 set_global_assignment -name SDC_FILE bss_verilog.SDC

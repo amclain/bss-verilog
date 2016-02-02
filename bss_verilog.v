@@ -88,145 +88,91 @@ module bss_verilog(
 //  REG/WIRE declarations
 //=======================================================
 
-// Mock input
-wire [7:0] data_in;
-wire write_command;
-wire write_address_0;
-wire write_address_1;
-wire write_address_2;
-wire write_address_3;
-wire write_address_4;
-wire write_address_5;
-wire write_sv_0;
-wire write_sv_1;
-wire write_data_0;
-wire write_data_1;
-wire write_data_2;
-wire write_data_3;
-
-reg [7:0] command;
-reg [7:0] address [0:5];
-reg [7:0] sv      [0:1];
-reg [7:0] data    [0:3];
-
-wire [7:0] out [0:28];
-
-wire [7:0] input_buffer[0:12];
+wire [7:0] command;
+wire [7:0] address [0:5];
+wire [7:0] sv      [0:1];
+wire [7:0] data    [0:3];
 
 //=======================================================
 //  Structural coding
 //=======================================================
 
 soundweb_encoder u0 (
-  .command (command),
+  .command   (command),
   .address_0 (address[0]),
   .address_1 (address[1]),
   .address_2 (address[2]),
   .address_3 (address[3]),
   .address_4 (address[4]),
   .address_5 (address[5]),
-  .sv_0 (sv[0]),
-  .sv_1 (sv[1]),
-  .data_0 (data[0]),
-  .data_1 (data[1]),
-  .data_2 (data[2]),
-  .data_3 (data[3]),
+  .sv_0      (sv[0]),
+  .sv_1      (sv[1]),
+  .data_0    (data[0]),
+  .data_1    (data[1]),
+  .data_2    (data[2]),
+  .data_3    (data[3]),
 
-  .packet_0  (out[0]),
-  .packet_1  (out[1]),
-  .packet_2  (out[2]),
-  .packet_3  (out[3]),
-  .packet_4  (out[4]),
-  .packet_5  (out[5]),
-  .packet_6  (out[6]),
-  .packet_7  (out[7]),
-  .packet_8  (out[8]),
-  .packet_9  (out[9]),
-  .packet_10 (out[10]),
-  .packet_11 (out[11]),
-  .packet_12 (out[12]),
-  .packet_13 (out[13]),
-  .packet_14 (out[14]),
-  .packet_15 (out[15]),
-  .packet_16 (out[16]),
-  .packet_17 (out[17]),
-  .packet_18 (out[18]),
-  .packet_19 (out[19]),
-  .packet_20 (out[20]),
-  .packet_21 (out[21]),
-  .packet_22 (out[22]),
-  .packet_23 (out[23]),
-  .packet_24 (out[24]),
-  .packet_25 (out[25]),
-  .packet_26 (out[26]),
-  .packet_27 (out[27]),
-  .packet_28 (out[28])
+  .packet_0  (GPIO_0[7:0]),
+  .packet_1  (GPIO_0[15:8]),
+  .packet_2  (GPIO_0[23:16]),
+  .packet_3  (GPIO_0[31:24]),
+  .packet_4  (GPIO_1[7:0]),
+  .packet_5  (GPIO_1[15:8]),
+  .packet_6  (GPIO_1[23:16]),
+  .packet_7  (GPIO_1[31:24]),
+  // .packet_8  (out[8]),
+  // .packet_9  (out[9]),
+  // .packet_10 (out[10]),
+  // .packet_11 (out[11]),
+  // .packet_12 (out[12]),
+  // .packet_13 (out[13]),
+  // .packet_14 (out[14]),
+  // .packet_15 (out[15]),
+  // .packet_16 (out[16]),
+  // .packet_17 (out[17]),
+  // .packet_18 (out[18]),
+  // .packet_19 (out[19]),
+  // .packet_20 (out[20]),
+  // .packet_21 (out[21]),
+  // .packet_22 (out[22]),
+  // .packet_23 (out[23]),
+  // .packet_24 (out[24]),
+  // .packet_25 (out[25]),
+  // .packet_26 (out[26]),
+  // .packet_27 (out[27]),
+  // .packet_28 (out[28])
 );
 
-// Mock input
-assign data_in[7:0] = ARDUINO_IO[7:0];
+mock_input u1 (
+  .data_in         (ARDUINO_IO[7:0]),
 
-assign write_command = ARDUINO_IO[8];
-assign write_address_0 = ARDUINO_IO[9];
-assign write_address_1 = ARDUINO_IO[10];
-assign write_address_2 = ARDUINO_IO[11];
-assign write_address_3 = ARDUINO_IO[12];
-assign write_address_4 = ARDUINO_IO[13];
-assign write_address_5 = ARDUINO_IO[14];
-assign write_sv_0 = ARDUINO_IO[15];
+  .write_command   (ARDUINO_IO[8]),
+  .write_address_0 (ARDUINO_IO[9]),
+  .write_address_1 (ARDUINO_IO[10]),
+  .write_address_2 (ARDUINO_IO[11]),
+  .write_address_3 (ARDUINO_IO[12]),
+  .write_address_4 (ARDUINO_IO[13]),
+  .write_address_5 (ARDUINO_IO[14]),
+  .write_sv_0      (ARDUINO_IO[15]),
+  .write_sv_1      (1'b0),
+  .write_data_0    (1'b0),
+  .write_data_1    (1'b0),
+  .write_data_2    (1'b0),
+  .write_data_3    (1'b0),
 
-always @(
-  posedge write_command or
-  posedge write_address_0 or
-  posedge write_address_1 or
-  posedge write_address_2 or
-  posedge write_address_3 or
-  posedge write_address_4 or
-  posedge write_address_5 or
-  posedge write_sv_0 or
-  posedge write_sv_1 or
-  posedge write_data_0 or
-  posedge write_data_1 or
-  posedge write_data_2 or
-  posedge write_data_3
-)
-begin
-  if (write_command) begin
-    command <= data_in;
-  end else if (write_address_0) begin
-    address[0] <= data_in;
-  end else if (write_address_1) begin
-    address[1] <= data_in;
-  end else if (write_address_2) begin
-    address[2] <= data_in;
-  end else if (write_address_3) begin
-    address[3] <= data_in;
-  end else if (write_address_4) begin
-    address[4] <= data_in;
-  end else if (write_address_5) begin
-    address[5] <= data_in;
-  end else if (write_sv_0) begin
-    sv[0] <= data_in;
-  end else if (write_sv_1) begin
-    sv[1] <= data_in;
-  end else if (write_data_0) begin
-    data[0] <= data_in;
-  end else if (write_data_1) begin
-    data[1] <= data_in;
-  end else if (write_data_2) begin
-    data[2] <= data_in;
-  end else if (write_data_3) begin
-    data[3] <= data_in;
-  end
-end
-
-assign GPIO_0[7:0]   = out[0][7:0];
-assign GPIO_0[15:8]  = out[1][7:0];
-assign GPIO_0[23:16] = out[2][7:0];
-assign GPIO_0[31:24] = out[3][7:0];
-assign GPIO_1[7:0]   = out[4][7:0];
-assign GPIO_1[15:8]  = out[5][7:0];
-assign GPIO_1[23:16] = out[6][7:0];
-assign GPIO_1[31:24] = out[7][7:0];
+  .command   (command),
+  .address_0 (address[0]),
+  .address_1 (address[1]),
+  .address_2 (address[2]),
+  .address_3 (address[3]),
+  .address_4 (address[4]),
+  .address_5 (address[5]),
+  .sv_0      (sv[0]),
+  .sv_1      (sv[1]),
+  .data_0    (data[0]),
+  .data_1    (data[1]),
+  .data_2    (data[2]),
+  .data_3    (data[3])
+);
 
 endmodule
