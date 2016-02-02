@@ -104,60 +104,64 @@ wire write_data_1;
 wire write_data_2;
 wire write_data_3;
 
-// wire clk;
-// wire do_encode;
-
 reg [7:0] command;
 reg [7:0] address [0:5];
 reg [7:0] sv      [0:1];
 reg [7:0] data    [0:3];
 
-reg [7:0] out     [0:28];
+wire [7:0] out [0:28];
 
 wire [7:0] input_buffer[0:12];
-
-parameter ESC = 8'h1B;
 
 //=======================================================
 //  Structural coding
 //=======================================================
 
-assign input_buffer[0]  = command;
-assign input_buffer[1]  = address[0];
-assign input_buffer[2]  = address[1];
-assign input_buffer[3]  = address[2];
-assign input_buffer[4]  = address[3];
-assign input_buffer[5]  = address[4];
-assign input_buffer[6]  = address[5];
-assign input_buffer[7]  = sv[0];
-assign input_buffer[8]  = sv[1];
-assign input_buffer[9]  = data[0];
-assign input_buffer[10] = data[1];
-assign input_buffer[11] = data[2];
-assign input_buffer[12] = data[3];
-
-// assign LED[0] = SW[1] ? !SW[0] : SW[0];
-
-// assign clk = FPGA_CLK1_50;
-// assign LED[0] = state;
-
-// always @ (posedge clk)
-// begin
-//     state <= !state;
-// end
-
-// assign GPIO_0[7:0]   = byte[0][7:0];
-// assign GPIO_0[15:8]  = byte[1][7:0];
-// assign GPIO_0[23:16] = byte[2][7:0];
-// assign GPIO_0[35:24] = byte[3][7:0];
-
-// always @(posedge clk)
-// begin
-//     byte[0] <= !byte[0];
-//     byte[1] <= !byte[1];
-//     byte[2] <= !byte[2];
-//     byte[3] <= !byte[3];
-// end
+soundweb_encoder u0 (
+    .command (command),
+    .address_0 (address[0]),
+    .address_1 (address[1]),
+    .address_2 (address[2]),
+    .address_3 (address[3]),
+    .address_4 (address[4]),
+    .address_5 (address[5]),
+    .sv_0 (sv[0]),
+    .sv_1 (sv[1]),
+    .data_0 (data[0]),
+    .data_1 (data[1]),
+    .data_2 (data[2]),
+    .data_3 (data[3]),
+    
+    .packet_0  (out[0]),
+    .packet_1  (out[1]),
+    .packet_2  (out[2]),
+    .packet_3  (out[3]),
+    .packet_4  (out[4]),
+    .packet_5  (out[5]),
+    .packet_6  (out[6]),
+    .packet_7  (out[7]),
+    .packet_8  (out[8]),
+    .packet_9  (out[9]),
+    .packet_10 (out[10]),
+    .packet_11 (out[11]),
+    .packet_12 (out[12]),
+    .packet_13 (out[13]),
+    .packet_14 (out[14]),
+    .packet_15 (out[15]),
+    .packet_16 (out[16]),
+    .packet_17 (out[17]),
+    .packet_18 (out[18]),
+    .packet_19 (out[19]),
+    .packet_20 (out[20]),
+    .packet_21 (out[21]),
+    .packet_22 (out[22]),
+    .packet_23 (out[23]),
+    .packet_24 (out[24]),
+    .packet_25 (out[25]),
+    .packet_26 (out[26]),
+    .packet_27 (out[27]),
+    .packet_28 (out[28])
+);
 
 // Mock input
 assign data_in[7:0] = ARDUINO_IO[7:0];
@@ -224,146 +228,5 @@ assign GPIO_1[7:0]   = out[4][7:0];
 assign GPIO_1[15:8]  = out[5][7:0];
 assign GPIO_1[23:16] = out[6][7:0];
 assign GPIO_1[31:24] = out[7][7:0];
-
-reg [5:0] address_is_escaped;
-reg [1:0] sv_is_escaped;
-reg [3:0] data_is_escaped;
-reg checksum_is_escaped;
-
-reg [5:0] address_offset;
-
-always @(*)
-begin
-    address_offset[0] = 0;
-    address_offset[1] = 0;
-    address_offset[2] = 0;
-    address_offset[3] = 0;
-    address_offset[4] = 0;
-    address_offset[5] = 0;
-    
-    out[0] = 8'h02;
-    out[1] = command;
-    
-    if (is_reserved_byte(address[0])) begin
-        address_is_escaped[0] = 1'b1;
-        out[2 + address_offset[0]] = ESC;
-        out[3 + address_offset[0]] = address[0] + 8'h80;
-    end else begin
-        address_is_escaped[0] = 1'b0;
-        out[2 + address_offset[0]] = address[0];
-    end
-    
-    if (address_is_escaped[0]) begin
-        address_offset[1] = address_offset[1] + 1;
-        address_offset[2] = address_offset[2] + 1;
-        address_offset[3] = address_offset[3] + 1;
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[1])) begin
-        address_is_escaped[1] = 1'b1;
-        out[3 + address_offset[1]] = ESC;
-        out[4 + address_offset[1]] = address[1] + 8'h80;
-    end else begin
-        address_is_escaped[1] = 1'b0;
-        out[3 + address_offset[1]] = address[1];
-    end
-    
-    if (address_is_escaped[1]) begin
-        address_offset[2] = address_offset[2] + 1;
-        address_offset[3] = address_offset[3] + 1;
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[2])) begin
-        address_is_escaped[2] = 1'b1;
-        out[4 + address_offset[2]] = ESC;
-        out[5 + address_offset[2]] = address[2] + 8'h80;
-    end else begin
-        address_is_escaped[2] = 1'b0;
-        out[4 + address_offset[2]] = address[2];
-    end
-    
-    if (address_is_escaped[2]) begin
-        address_offset[3] = address_offset[3] + 1;
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[3])) begin
-        address_is_escaped[3] = 1'b1;
-        out[5 + address_offset[3]] = ESC;
-        out[6 + address_offset[3]] = address[3] + 8'h80;
-    end else begin
-        address_is_escaped[3] = 1'b0;
-        out[5 + address_offset[3]] = address[3];
-    end
-    
-    if (address_is_escaped[3]) begin
-        address_offset[4] = address_offset[4] + 1;
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[4])) begin
-        address_is_escaped[4] = 1'b1;
-        out[6 + address_offset[4]] = ESC;
-        out[7 + address_offset[4]] = address[4] + 8'h80;
-    end else begin
-        address_is_escaped[4] = 1'b0;
-        out[6 + address_offset[4]] = address[4];
-    end
-    
-    if (address_is_escaped[4]) begin
-        address_offset[5] = address_offset[5] + 1;
-    end
-    
-    if (is_reserved_byte(address[5])) begin
-        address_is_escaped[5] = 1'b1;
-        out[7 + address_offset[5]] = ESC;
-        out[8 + address_offset[5]] = address[5] + 8'h80;
-    end else begin
-        address_is_escaped[5] = 1'b0;
-        out[7 + address_offset[5]] = address[5];
-    end
-    
-    // if (is_reserved_byte(address[1])) begin
-    //     address_is_escaped[1] = 1'b1;
-        
-    //     if (address_is_escaped[0]) begin
-    //         out[4] = ESC;
-    //         out[5] = address[1] + 8'h80;
-    //     end else begin
-    //         out[3] = ESC;
-    //         out[4] = address[1] + 8'h80;
-    //     end
-    // end else begin
-    //     address_is_escaped[1] = 1'b0;
-        
-    //     if (address_is_escaped[0]) begin
-    //         out[4] = address[1];
-    //     end else begin
-    //         out[3] = address[1];
-    //     end
-    // end
-end
-
-function is_reserved_byte;
-input [7:0] byte;
-begin
-    if (
-        byte == 8'h02 ||
-        byte == 8'h03 ||
-        byte == 8'h06 ||
-        byte == 8'h15 ||
-        byte == 8'h1B
-    ) begin
-        is_reserved_byte = 1'b1;
-    end else begin
-        is_reserved_byte = 1'b0;
-    end
-end
-endfunction
 
 endmodule
