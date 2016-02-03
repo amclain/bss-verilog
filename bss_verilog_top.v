@@ -93,6 +93,8 @@ wire [7:0] address [0:5];
 wire [7:0] sv      [0:1];
 wire [7:0] data    [0:3];
 
+wire [7:0] packet [0:28];
+
 //=======================================================
 //  Structural coding
 //=======================================================
@@ -112,35 +114,35 @@ soundweb_encoder u0 (
   .data_2    (data[2]),
   .data_3    (data[3]),
 
-  .packet_0  (GPIO_0[7:0]),
-  .packet_1  (GPIO_0[15:8]),
-  .packet_2  (GPIO_0[23:16]),
-  .packet_3  (GPIO_0[31:24]),
-  .packet_4  (GPIO_1[7:0]),
-  .packet_5  (GPIO_1[15:8]),
-  .packet_6  (GPIO_1[23:16]),
-  .packet_7  (GPIO_1[31:24]),
-  // .packet_8  (out[8]),
-  // .packet_9  (out[9]),
-  // .packet_10 (out[10]),
-  // .packet_11 (out[11]),
-  // .packet_12 (out[12]),
-  // .packet_13 (out[13]),
-  // .packet_14 (out[14]),
-  // .packet_15 (out[15]),
-  // .packet_16 (out[16]),
-  // .packet_17 (out[17]),
-  // .packet_18 (out[18]),
-  // .packet_19 (out[19]),
-  // .packet_20 (out[20]),
-  // .packet_21 (out[21]),
-  // .packet_22 (out[22]),
-  // .packet_23 (out[23]),
-  // .packet_24 (out[24]),
-  // .packet_25 (out[25]),
-  // .packet_26 (out[26]),
-  // .packet_27 (out[27]),
-  // .packet_28 (out[28])
+  .packet_0  (packet[0]),
+  .packet_1  (packet[1]),
+  .packet_2  (packet[2]),
+  .packet_3  (packet[3]),
+  .packet_4  (packet[4]),
+  .packet_5  (packet[5]),
+  .packet_6  (packet[6]),
+  .packet_7  (packet[7]),
+  .packet_8  (packet[8]),
+  .packet_9  (packet[9]),
+  .packet_10 (packet[10]),
+  .packet_11 (packet[11]),
+  .packet_12 (packet[12]),
+  .packet_13 (packet[13]),
+  .packet_14 (packet[14]),
+  .packet_15 (packet[15]),
+  .packet_16 (packet[16]),
+  .packet_17 (packet[17]),
+  .packet_18 (packet[18]),
+  .packet_19 (packet[19]),
+  .packet_20 (packet[20]),
+  .packet_21 (packet[21]),
+  .packet_22 (packet[22]),
+  .packet_23 (packet[23]),
+  .packet_24 (packet[24]),
+  .packet_25 (packet[25]),
+  .packet_26 (packet[26]),
+  .packet_27 (packet[27]),
+  .packet_28 (packet[28])
 );
 
 mock_input u1 (
@@ -173,6 +175,41 @@ mock_input u1 (
   .data_1    (data[1]),
   .data_2    (data[2]),
   .data_3    (data[3])
+);
+
+mock_output u2 (
+  .packet_0  (packet[0]),
+  .packet_1  (packet[1]),
+  .packet_2  (packet[2]),
+  .packet_3  (packet[3]),
+  .packet_4  (packet[4]),
+  .packet_5  (packet[5]),
+  .packet_6  (packet[6]),
+  .packet_7  (packet[7]),
+  .packet_8  (packet[8]),
+  .packet_9  (packet[9]),
+  .packet_10 (packet[10]),
+  .packet_11 (packet[11]),
+  .packet_12 (packet[12]),
+  .packet_13 (packet[13]),
+  .packet_14 (packet[14]),
+  .packet_15 (packet[15]),
+  .packet_16 (packet[16]),
+  .packet_17 (packet[17]),
+  .packet_18 (packet[18]),
+  .packet_19 (packet[19]),
+  .packet_20 (packet[20]),
+  .packet_21 (packet[21]),
+  .packet_22 (packet[22]),
+  .packet_23 (packet[23]),
+  .packet_24 (packet[24]),
+  .packet_25 (packet[25]),
+  .packet_26 (packet[26]),
+  .packet_27 (packet[27]),
+  .packet_28 (packet[28]),
+
+  .data_selector (GPIO_0[5:0]),
+  .data (GPIO_0[31:16])
 );
 
 endmodule
