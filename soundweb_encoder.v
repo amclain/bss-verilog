@@ -50,7 +50,7 @@ wire [7:0] address [0:5];
 wire [7:0] sv      [0:1];
 wire [7:0] data    [0:3];
 
-reg  [7:0] packet_buf [0:28];
+reg  [7:0] output_buffer [0:28];
 
 assign address[0] = address_0;
 assign address[1] = address_1;
@@ -67,171 +67,190 @@ assign data[1] = data_1;
 assign data[2] = data_2;
 assign data[3] = data_3;
 
-assign packet_0  = packet_buf[0];
-assign packet_1  = packet_buf[1];
-assign packet_2  = packet_buf[2];
-assign packet_3  = packet_buf[3];
-assign packet_4  = packet_buf[4];
-assign packet_5  = packet_buf[5];
-assign packet_6  = packet_buf[6];
-assign packet_7  = packet_buf[7];
-assign packet_8  = packet_buf[8];
-assign packet_9  = packet_buf[9];
-assign packet_10 = packet_buf[10];
-assign packet_11 = packet_buf[11];
-assign packet_12 = packet_buf[12];
-assign packet_13 = packet_buf[13];
-assign packet_14 = packet_buf[14];
-assign packet_15 = packet_buf[15];
-assign packet_16 = packet_buf[16];
-assign packet_17 = packet_buf[17];
-assign packet_18 = packet_buf[18];
-assign packet_19 = packet_buf[19];
-assign packet_20 = packet_buf[20];
-assign packet_21 = packet_buf[21];
-assign packet_22 = packet_buf[22];
-assign packet_23 = packet_buf[23];
-assign packet_24 = packet_buf[24];
-assign packet_25 = packet_buf[25];
-assign packet_26 = packet_buf[26];
-assign packet_27 = packet_buf[27];
+assign packet_0  = output_buffer[0];
+assign packet_1  = output_buffer[1];
+assign packet_2  = output_buffer[2];
+assign packet_3  = output_buffer[3];
+assign packet_4  = output_buffer[4];
+assign packet_5  = output_buffer[5];
+assign packet_6  = output_buffer[6];
+assign packet_7  = output_buffer[7];
+assign packet_8  = output_buffer[8];
+assign packet_9  = output_buffer[9];
+assign packet_10 = output_buffer[10];
+assign packet_11 = output_buffer[11];
+assign packet_12 = output_buffer[12];
+assign packet_13 = output_buffer[13];
+assign packet_14 = output_buffer[14];
+assign packet_15 = output_buffer[15];
+assign packet_16 = output_buffer[16];
+assign packet_17 = output_buffer[17];
+assign packet_18 = output_buffer[18];
+assign packet_19 = output_buffer[19];
+assign packet_20 = output_buffer[20];
+assign packet_21 = output_buffer[21];
+assign packet_22 = output_buffer[22];
+assign packet_23 = output_buffer[23];
+assign packet_24 = output_buffer[24];
+assign packet_25 = output_buffer[25];
+assign packet_26 = output_buffer[26];
+assign packet_27 = output_buffer[27];
 
-wire [7:0] input_buffer[0:12];
+wire [7:0]  input_buffer  [0:12];
+reg  [5:0]  output_offset [0:12];
+reg  [12:0] input_byte_is_escaped;
 
-reg [5:0] address_is_escaped;
-reg [1:0] sv_is_escaped;
-reg [3:0] data_is_escaped;
-reg checksum_is_escaped;
+parameter COMMAND   = 0;
+parameter ADDRESS_0 = 1;
+parameter ADDRESS_1 = 2;
+parameter ADDRESS_2 = 3;
+parameter ADDRESS_3 = 4;
+parameter ADDRESS_4 = 5;
+parameter ADDRESS_5 = 6;
+parameter SV_0      = 7;
+parameter SV_1      = 8;
+parameter DATA_0    = 9;
+parameter DATA_1    = 10;
+parameter DATA_2    = 11;
+parameter DATA_3    = 12;
+parameter CHECKSUM  = 13; // Not in the input buffer, but included in `input_byte_is_escaped`.
 
-reg [5:0] address_offset;
-
-assign input_buffer[0]  = command;
-assign input_buffer[1]  = address[0];
-assign input_buffer[2]  = address[1];
-assign input_buffer[3]  = address[2];
-assign input_buffer[4]  = address[3];
-assign input_buffer[5]  = address[4];
-assign input_buffer[6]  = address[5];
-assign input_buffer[7]  = sv[0];
-assign input_buffer[8]  = sv[1];
-assign input_buffer[9]  = data[0];
-assign input_buffer[10] = data[1];
-assign input_buffer[11] = data[2];
-assign input_buffer[12] = data[3];
+assign input_buffer[COMMAND]   = command;
+assign input_buffer[ADDRESS_0] = address[0];
+assign input_buffer[ADDRESS_1] = address[1];
+assign input_buffer[ADDRESS_2] = address[2];
+assign input_buffer[ADDRESS_3] = address[3];
+assign input_buffer[ADDRESS_4] = address[4];
+assign input_buffer[ADDRESS_5] = address[5];
+assign input_buffer[SV_0]      = sv[0];
+assign input_buffer[SV_1]      = sv[1];
+assign input_buffer[DATA_0]    = data[0];
+assign input_buffer[DATA_1]    = data[1];
+assign input_buffer[DATA_2]    = data[2];
+assign input_buffer[DATA_3]    = data[3];
 
 always @(*)
 begin
-  address_offset[0] = 0;
-  address_offset[1] = 0;
-  address_offset[2] = 0;
-  address_offset[3] = 0;
-  address_offset[4] = 0;
-  address_offset[5] = 0;
+  output_offset[0]  = 0;
+  output_offset[1]  = 0;
+  output_offset[2]  = 0;
+  output_offset[3]  = 0;
+  output_offset[4]  = 0;
+  output_offset[5]  = 0;
+  output_offset[6]  = 0;
+  output_offset[7]  = 0;
+  output_offset[8]  = 0;
+  output_offset[9]  = 0;
+  output_offset[10] = 0;
+  output_offset[11] = 0;
+  output_offset[12] = 0;
 
-  packet_buf[0] = 8'h02;
-  packet_buf[1] = command;
+  input_byte_is_escaped = 13'b0000000000000;
 
-  if (is_reserved_byte(address[0])) begin
-    address_is_escaped[0] = 1'b1;
-    packet_buf[2 + address_offset[0]] = ESC;
-    packet_buf[3 + address_offset[0]] = address[0] + 8'h80;
+  output_buffer[0] = 8'h02;
+  output_buffer[1] = input_buffer[COMMAND];
+
+  if (is_reserved_byte(input_buffer[ADDRESS_0])) begin
+    input_byte_is_escaped[ADDRESS_0] = 1'b1;
+    output_buffer[2 + output_offset[ADDRESS_0]] = ESC;
+    output_buffer[3 + output_offset[ADDRESS_0]] = input_buffer[ADDRESS_0] + 8'h80;
   end else begin
-    address_is_escaped[0] = 1'b0;
-    packet_buf[2 + address_offset[0]] = address[0];
+    input_byte_is_escaped[ADDRESS_0] = 1'b0;
+    output_buffer[2 + output_offset[ADDRESS_0]] = input_buffer[ADDRESS_0];
   end
 
-  if (address_is_escaped[0]) begin
-    address_offset[1] = address_offset[1] + 1;
-    address_offset[2] = address_offset[2] + 1;
-    address_offset[3] = address_offset[3] + 1;
-    address_offset[4] = address_offset[4] + 1;
-    address_offset[5] = address_offset[5] + 1;
+  if (input_byte_is_escaped[ADDRESS_0]) begin
+    output_offset[ADDRESS_1] = output_offset[ADDRESS_1] + 1;
+    output_offset[ADDRESS_2] = output_offset[ADDRESS_2] + 1;
+    output_offset[ADDRESS_3] = output_offset[ADDRESS_3] + 1;
+    output_offset[ADDRESS_4] = output_offset[ADDRESS_4] + 1;
+    output_offset[ADDRESS_5] = output_offset[ADDRESS_5] + 1;
   end
 
-  if (is_reserved_byte(address[1])) begin
-    address_is_escaped[1] = 1'b1;
-    packet_buf[3 + address_offset[1]] = ESC;
-    packet_buf[4 + address_offset[1]] = address[1] + 8'h80;
+  if (is_reserved_byte(input_buffer[ADDRESS_1])) begin
+    input_byte_is_escaped[ADDRESS_1] = 1'b1;
+    output_buffer[3 + output_offset[ADDRESS_1]] = ESC;
+    output_buffer[4 + output_offset[ADDRESS_1]] = input_buffer[ADDRESS_1] + 8'h80;
   end else begin
-    address_is_escaped[1] = 1'b0;
-    packet_buf[3 + address_offset[1]] = address[1];
+    input_byte_is_escaped[ADDRESS_1] = 1'b0;
+    output_buffer[3 + output_offset[ADDRESS_1]] = input_buffer[ADDRESS_1];
   end
 
-  if (address_is_escaped[1]) begin
-    address_offset[2] = address_offset[2] + 1;
-    address_offset[3] = address_offset[3] + 1;
-    address_offset[4] = address_offset[4] + 1;
-    address_offset[5] = address_offset[5] + 1;
+  if (input_byte_is_escaped[ADDRESS_1]) begin
+    output_offset[ADDRESS_2] = output_offset[ADDRESS_2] + 1;
+    output_offset[ADDRESS_3] = output_offset[ADDRESS_3] + 1;
+    output_offset[ADDRESS_4] = output_offset[ADDRESS_4] + 1;
+    output_offset[ADDRESS_5] = output_offset[ADDRESS_5] + 1;
   end
 
-  if (is_reserved_byte(address[2])) begin
-    address_is_escaped[2] = 1'b1;
-    packet_buf[4 + address_offset[2]] = ESC;
-    packet_buf[5 + address_offset[2]] = address[2] + 8'h80;
-  end else begin
-    address_is_escaped[2] = 1'b0;
-    packet_buf[4 + address_offset[2]] = address[2];
-  end
+  // if (is_reserved_byte(address[2])) begin
+  //   address_is_escaped[2] = 1'b1;
+  //   output_buffer[4 + address_output_offset[2]] = ESC;
+  //   output_buffer[5 + address_output_offset[2]] = address[2] + 8'h80;
+  // end else begin
+  //   address_is_escaped[2] = 1'b0;
+  //   output_buffer[4 + address_output_offset[2]] = address[2];
+  // end
 
-  if (address_is_escaped[2]) begin
-    address_offset[3] = address_offset[3] + 1;
-    address_offset[4] = address_offset[4] + 1;
-    address_offset[5] = address_offset[5] + 1;
-  end
+  // if (address_is_escaped[2]) begin
+  //   address_output_offset[3] = address_output_offset[3] + 1;
+  //   address_output_offset[4] = address_output_offset[4] + 1;
+  //   address_output_offset[5] = address_output_offset[5] + 1;
+  // end
 
-  if (is_reserved_byte(address[3])) begin
-    address_is_escaped[3] = 1'b1;
-    packet_buf[5 + address_offset[3]] = ESC;
-    packet_buf[6 + address_offset[3]] = address[3] + 8'h80;
-  end else begin
-    address_is_escaped[3] = 1'b0;
-    packet_buf[5 + address_offset[3]] = address[3];
-  end
+  // if (is_reserved_byte(address[3])) begin
+  //   address_is_escaped[3] = 1'b1;
+  //   output_buffer[5 + address_output_offset[3]] = ESC;
+  //   output_buffer[6 + address_output_offset[3]] = address[3] + 8'h80;
+  // end else begin
+  //   address_is_escaped[3] = 1'b0;
+  //   output_buffer[5 + address_output_offset[3]] = address[3];
+  // end
 
-  if (address_is_escaped[3]) begin
-    address_offset[4] = address_offset[4] + 1;
-    address_offset[5] = address_offset[5] + 1;
-  end
+  // if (address_is_escaped[3]) begin
+  //   address_output_offset[4] = address_output_offset[4] + 1;
+  //   address_output_offset[5] = address_output_offset[5] + 1;
+  // end
 
-  if (is_reserved_byte(address[4])) begin
-    address_is_escaped[4] = 1'b1;
-    packet_buf[6 + address_offset[4]] = ESC;
-    packet_buf[7 + address_offset[4]] = address[4] + 8'h80;
-  end else begin
-    address_is_escaped[4] = 1'b0;
-    packet_buf[6 + address_offset[4]] = address[4];
-  end
+  // if (is_reserved_byte(address[4])) begin
+  //   address_is_escaped[4] = 1'b1;
+  //   output_buffer[6 + address_output_offset[4]] = ESC;
+  //   output_buffer[7 + address_output_offset[4]] = address[4] + 8'h80;
+  // end else begin
+  //   address_is_escaped[4] = 1'b0;
+  //   output_buffer[6 + address_output_offset[4]] = address[4];
+  // end
 
-  if (address_is_escaped[4]) begin
-    address_offset[5] = address_offset[5] + 1;
-  end
+  // if (address_is_escaped[4]) begin
+  //   address_output_offset[5] = address_output_offset[5] + 1;
+  // end
 
-  if (is_reserved_byte(address[5])) begin
-    address_is_escaped[5] = 1'b1;
-    packet_buf[7 + address_offset[5]] = ESC;
-    packet_buf[8 + address_offset[5]] = address[5] + 8'h80;
-  end else begin
-    address_is_escaped[5] = 1'b0;
-    packet_buf[7 + address_offset[5]] = address[5];
-  end
+  // if (is_reserved_byte(address[5])) begin
+  //   address_is_escaped[5] = 1'b1;
+  //   output_buffer[7 + address_output_offset[5]] = ESC;
+  //   output_buffer[8 + address_output_offset[5]] = address[5] + 8'h80;
+  // end else begin
+  //   address_is_escaped[5] = 1'b0;
+  //   output_buffer[7 + address_output_offset[5]] = address[5];
+  // end
 
   // if (is_reserved_byte(address[1])) begin
   //   address_is_escaped[1] = 1'b1;
 
   //   if (address_is_escaped[0]) begin
-  //     packet_buf[4] = ESC;
-  //     packet_buf[5] = address[1] + 8'h80;
+  //     output_buffer[4] = ESC;
+  //     output_buffer[5] = address[1] + 8'h80;
   //   end else begin
-  //     packet_buf[3] = ESC;
-  //     packet_buf[4] = address[1] + 8'h80;
+  //     output_buffer[3] = ESC;
+  //     output_buffer[4] = address[1] + 8'h80;
   //   end
   // end else begin
   //   address_is_escaped[1] = 1'b0;
 
   //   if (address_is_escaped[0]) begin
-  //     packet_buf[4] = address[1];
+  //     output_buffer[4] = address[1];
   //   end else begin
-  //     packet_buf[3] = address[1];
+  //     output_buffer[3] = address[1];
   //   end
   // end
 end
