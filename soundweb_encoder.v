@@ -133,33 +133,10 @@ reg [5:0] j;
 
 always @(*)
 begin
-  output_index[0]  = 0;
-  output_index[1]  = 0;
-  output_index[2]  = 0;
-  output_index[3]  = 0;
-  output_index[4]  = 0;
-  output_index[5]  = 0;
-  output_index[6]  = 0;
-  output_index[7]  = 0;
-  output_index[8]  = 0;
-  output_index[9]  = 0;
-  output_index[10] = 0;
-  output_index[11] = 0;
-  output_index[12] = 0;
-
-  output_offset[0]  = 0;
-  output_offset[1]  = 0;
-  output_offset[2]  = 0;
-  output_offset[3]  = 0;
-  output_offset[4]  = 0;
-  output_offset[5]  = 0;
-  output_offset[6]  = 0;
-  output_offset[7]  = 0;
-  output_offset[8]  = 0;
-  output_offset[9]  = 0;
-  output_offset[10] = 0;
-  output_offset[11] = 0;
-  output_offset[12] = 0;
+  for (i = COMMAND; i <= DATA_3; i = i + 1) begin
+    output_index[i] = 0;
+    output_offset[i] = 0;
+  end
 
   output_buffer[0] = 8'h02;
   output_buffer[1] = input_buffer[COMMAND];
