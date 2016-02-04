@@ -96,8 +96,9 @@ assign packet_25 = output_buffer[25];
 assign packet_26 = output_buffer[26];
 assign packet_27 = output_buffer[27];
 
-wire [7:0]  input_buffer  [0:12];
-reg  [5:0]  output_offset [0:12];
+wire [7:0] input_buffer  [0:12];
+reg  [5:0] output_index  [0:12];
+reg  [5:0] output_offset [0:12];
 
 parameter COMMAND   = 0;
 parameter ADDRESS_0 = 1;
@@ -127,8 +128,25 @@ assign input_buffer[DATA_1]    = data[1];
 assign input_buffer[DATA_2]    = data[2];
 assign input_buffer[DATA_3]    = data[3];
 
+reg [5:0] i;
+reg [5:0] j;
+
 always @(*)
 begin
+  output_index[0]  = 0;
+  output_index[1]  = 0;
+  output_index[2]  = 0;
+  output_index[3]  = 0;
+  output_index[4]  = 0;
+  output_index[5]  = 0;
+  output_index[6]  = 0;
+  output_index[7]  = 0;
+  output_index[8]  = 0;
+  output_index[9]  = 0;
+  output_index[10] = 0;
+  output_index[11] = 0;
+  output_index[12] = 0;
+
   output_offset[0]  = 0;
   output_offset[1]  = 0;
   output_offset[2]  = 0;
@@ -146,47 +164,25 @@ begin
   output_buffer[0] = 8'h02;
   output_buffer[1] = input_buffer[COMMAND];
 
-  // if (is_reserved_byte(input_buffer[ADDRESS_0])) begin
-  //   input_byte_is_escaped[ADDRESS_0] = 1'b1;
-  //   output_buffer[2 + output_offset[ADDRESS_0]] = ESC;
-  //   output_buffer[3 + output_offset[ADDRESS_0]] = input_buffer[ADDRESS_0] + 8'h80;
-  // end else begin
-  //   input_byte_is_escaped[ADDRESS_0] = 1'b0;
-  //   output_buffer[2 + output_offset[ADDRESS_0]] = input_buffer[ADDRESS_0];
-  // end
+  for (i = COMMAND; i <= DATA_3; i = i + 1) begin
+    // Offset is +1 for STX in output_buffer.
+    output_index[i] = 1 + i + output_offset[i];
 
-  process_byte(ADDRESS_0);
+    if (is_reserved_byte(input_buffer[i])) begin
+      output_buffer[output_index[i]] = ESC;
+      output_buffer[output_index[i] + 1] = input_buffer[i] + 8'h80;
 
-  // if (is_reserved_byte(input_buffer[ADDRESS_1])) begin
-  //   input_byte_is_escaped[ADDRESS_1] = 1'b1;
-  //   output_buffer[3 + output_offset[ADDRESS_1]] = ESC;
-  //   output_buffer[4 + output_offset[ADDRESS_1]] = input_buffer[ADDRESS_1] + 8'h80;
-  // end else begin
-  //   input_byte_is_escaped[ADDRESS_1] = 1'b0;
-  //   output_buffer[3 + output_offset[ADDRESS_1]] = input_buffer[ADDRESS_1];
-  // end
+      for (j = i + 1; j <= DATA_3; j = j + 1) begin
+        output_offset[j] = output_offset[j] + 1;
+      end
+    end else begin
+      output_buffer[output_index[i]] = input_buffer[i];
+    end
+  end
 
-  process_byte(ADDRESS_1);
+  // TODO: Checksum
 
-  // if (is_reserved_byte(address[2])) begin
-  //   address_is_escaped[2] = 1'b1;
-  //   output_buffer[4 + address_output_offset[2]] = ESC;
-  //   output_buffer[5 + address_output_offset[2]] = address[2] + 8'h80;
-  // end else begin
-  //   address_is_escaped[2] = 1'b0;
-  //   output_buffer[4 + address_output_offset[2]] = address[2];
-  // end
-
-  process_byte(ADDRESS_2);
-
-  // if (is_reserved_byte(address[3])) begin
-  //   address_is_escaped[3] = 1'b1;
-  //   output_buffer[5 + address_output_offset[3]] = ESC;
-  //   output_buffer[6 + address_output_offset[3]] = address[3] + 8'h80;
-  // end else begin
-  //   address_is_escaped[3] = 1'b0;
-  //   output_buffer[5 + address_output_offset[3]] = address[3];
-  // end
+  // TODO: ETX
 end
 
 function is_reserved_byte;
@@ -205,27 +201,5 @@ begin
   end
 end
 endfunction
-
-task process_byte;
-input input_index;
-reg [5:0] output_index;
-reg [5:0] i;
-begin
-  // 48 ALM's used when working - for 2 or 3 input address bytes
-  ////////////////////////////////////////////////////////////////////////////
-  output_index = COMMAND + input_index + output_offset[input_index];
-
-  if (is_reserved_byte(input_buffer[input_index])) begin
-    output_buffer[output_index] = ESC;
-    output_buffer[output_index + 1] = input_buffer[input_index] + 8'h80;
-
-    for (i = input_index + 1; i <= 12; i = i + 1) begin
-      output_offset[i] = output_offset[i] + 1;
-    end
-  end else begin
-    output_buffer[output_index] = input_buffer[input_index];
-  end
-end
-endtask
 
 endmodule
