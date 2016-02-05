@@ -95,6 +95,7 @@ assign packet_24 = output_buffer[24];
 assign packet_25 = output_buffer[25];
 assign packet_26 = output_buffer[26];
 assign packet_27 = output_buffer[27];
+assign packet_28 = output_buffer[28];
 
 wire [7:0] input_buffer  [0:12];
 reg  [5:0] output_index  [0:12];
@@ -136,6 +137,10 @@ begin
   for (i = COMMAND; i <= DATA_3; i = i + 1) begin
     output_index[i] = 0;
     output_offset[i] = 0;
+  end
+
+  for (i = 0; i <= 28; i = i + 1) begin
+    output_buffer[i] = 0;
   end
 
   output_buffer[0] = 8'h02;
