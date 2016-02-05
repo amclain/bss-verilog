@@ -44,6 +44,10 @@ module soundweb_encoder(
   output [7:0] packet_28
 );
 
+parameter STX = 8'h02;
+parameter ETX = 8'h03;
+parameter ACK = 8'h06;
+parameter NAK = 8'h15;
 parameter ESC = 8'h1B;
 
 wire [7:0] address [0:5];
@@ -99,8 +103,8 @@ assign packet_27 = output_buffer[27];
 assign packet_28 = output_buffer[28];
 
 wire [7:0] input_buffer  [0:13];
-reg  [5:0] output_index  [0:13];
-reg  [5:0] output_offset [0:13];
+reg  [5:0] output_index  [0:14];
+reg  [5:0] output_offset [0:14];
 
 parameter COMMAND   = 0;
 parameter ADDRESS_0 = 1;
@@ -116,6 +120,7 @@ parameter DATA_1    = 10;
 parameter DATA_2    = 11;
 parameter DATA_3    = 12;
 parameter CHECKSUM  = 13;
+parameter ETX_INDEX = 14;
 
 assign input_buffer[COMMAND]   = command;
 assign input_buffer[ADDRESS_0] = address[0];
@@ -137,7 +142,7 @@ reg [5:0] j;
 
 always @(*)
 begin
-  for (i = COMMAND; i <= CHECKSUM; i = i + 1) begin
+  for (i = COMMAND; i <= ETX_INDEX; i = i + 1) begin
     output_index[i] = 0;
     output_offset[i] = 0;
   end
@@ -152,7 +157,7 @@ begin
     checksum = checksum ^ input_buffer[i];
   end
 
-  output_buffer[0] = 8'h02;
+  output_buffer[0] = STX;
 
   for (i = COMMAND; i <= CHECKSUM; i = i + 1) begin
     // Offset is +1 for STX in output_buffer.
@@ -162,7 +167,7 @@ begin
       output_buffer[output_index[i]] = ESC;
       output_buffer[output_index[i] + 1] = input_buffer[i] + 8'h80;
 
-      for (j = i + 1; j <= CHECKSUM; j = j + 1) begin
+      for (j = i + 1; j <= ETX_INDEX; j = j + 1) begin
         output_offset[j] = output_offset[j] + 1;
       end
     end else begin
@@ -170,18 +175,19 @@ begin
     end
   end
 
-  // TODO: ETX
+  output_index[ETX_INDEX] = 1 + ETX_INDEX + output_offset[ETX_INDEX];
+  output_buffer[output_index[ETX_INDEX]] = ETX;
 end
 
 function is_reserved_byte;
 input [7:0] byte;
 begin
   if (
-    byte == 8'h02 ||
-    byte == 8'h03 ||
-    byte == 8'h06 ||
-    byte == 8'h15 ||
-    byte == 8'h1B
+    byte == STX ||
+    byte == ETX ||
+    byte == ACK ||
+    byte == NAK ||
+    byte == ESC
   ) begin
     is_reserved_byte = 1'b1;
   end else begin
