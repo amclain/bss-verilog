@@ -137,8 +137,8 @@ assign input_buffer[DATA_2]    = data[2];
 assign input_buffer[DATA_3]    = data[3];
 assign input_buffer[CHECKSUM]  = checksum;
 
-reg [5:0] i;
-reg [5:0] j;
+integer i;
+integer j;
 
 always @(*)
 begin
