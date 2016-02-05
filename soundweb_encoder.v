@@ -49,6 +49,7 @@ parameter ESC = 8'h1B;
 wire [7:0] address [0:5];
 wire [7:0] sv      [0:1];
 wire [7:0] data    [0:3];
+reg  [7:0] checksum;
 
 reg  [7:0] output_buffer [0:28];
 
@@ -97,9 +98,9 @@ assign packet_26 = output_buffer[26];
 assign packet_27 = output_buffer[27];
 assign packet_28 = output_buffer[28];
 
-wire [7:0] input_buffer  [0:12];
-reg  [5:0] output_index  [0:12];
-reg  [5:0] output_offset [0:12];
+wire [7:0] input_buffer  [0:13];
+reg  [5:0] output_index  [0:13];
+reg  [5:0] output_offset [0:13];
 
 parameter COMMAND   = 0;
 parameter ADDRESS_0 = 1;
@@ -114,6 +115,7 @@ parameter DATA_0    = 9;
 parameter DATA_1    = 10;
 parameter DATA_2    = 11;
 parameter DATA_3    = 12;
+parameter CHECKSUM  = 13;
 
 assign input_buffer[COMMAND]   = command;
 assign input_buffer[ADDRESS_0] = address[0];
@@ -128,13 +130,14 @@ assign input_buffer[DATA_0]    = data[0];
 assign input_buffer[DATA_1]    = data[1];
 assign input_buffer[DATA_2]    = data[2];
 assign input_buffer[DATA_3]    = data[3];
+assign input_buffer[CHECKSUM]  = checksum;
 
 reg [5:0] i;
 reg [5:0] j;
 
 always @(*)
 begin
-  for (i = COMMAND; i <= DATA_3; i = i + 1) begin
+  for (i = COMMAND; i <= CHECKSUM; i = i + 1) begin
     output_index[i] = 0;
     output_offset[i] = 0;
   end
@@ -143,10 +146,15 @@ begin
     output_buffer[i] = 0;
   end
 
-  output_buffer[0] = 8'h02;
-  output_buffer[1] = input_buffer[COMMAND];
+  checksum = 8'h00;
 
   for (i = COMMAND; i <= DATA_3; i = i + 1) begin
+    checksum = checksum ^ input_buffer[i];
+  end
+
+  output_buffer[0] = 8'h02;
+
+  for (i = COMMAND; i <= CHECKSUM; i = i + 1) begin
     // Offset is +1 for STX in output_buffer.
     output_index[i] = 1 + i + output_offset[i];
 
@@ -154,15 +162,13 @@ begin
       output_buffer[output_index[i]] = ESC;
       output_buffer[output_index[i] + 1] = input_buffer[i] + 8'h80;
 
-      for (j = i + 1; j <= DATA_3; j = j + 1) begin
+      for (j = i + 1; j <= CHECKSUM; j = j + 1) begin
         output_offset[j] = output_offset[j] + 1;
       end
     end else begin
       output_buffer[output_index[i]] = input_buffer[i];
     end
   end
-
-  // TODO: Checksum
 
   // TODO: ETX
 end
